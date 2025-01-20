@@ -1,6 +1,8 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QFrame, QHBoxLayout, QLabel, QVBoxLayout
+from PySide6.QtWidgets import (QApplication, QMainWindow, QFrame, QHBoxLayout, QLabel, QVBoxLayout, QSpacerItem,
+                               QSizePolicy)
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from meta_app.ui.views.ui_main import Ui_MainWindow
+from meta_app.core.file_handler import get_photo_data
 from pathlib import Path
 import logging
 
@@ -29,18 +31,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.show_file_info(file_path)
 
     def show_file_info(self, file_path):
-        if not self.left_frame_info.layout():
-            scroll_widget = QVBoxLayout(self.left_frame_info)
-        else:
-            scroll_widget = self.left_frame_info.layout()
-
-        for i in reversed(range(scroll_widget.count())):
-            widget = scroll_widget.itemAt(i).widget()
-            if widget is not None:
-                widget.deleteLater()
+        self.clear_layout(self.verticalLayout_4)
 
         file_name = Path(file_path).name
-        self.create_file_feature("Имя файла", file_name)
+        # self.create_file_feature("Имя файла", file_name)
+
+        file_data = get_photo_data(file_path)
+
+        for key, value in file_data.items():
+            self.create_file_feature(key, value)
+
+        self.add_spacer()
+
+    def clear_layout(self, layout):
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+
+            if widget is not None:
+                widget.deleteLater()
+            elif item.spacerItem() is not None:
+                del item
 
 
     def create_file_feature(self, feature, value):
@@ -48,15 +59,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         frame.setFrameShape(QFrame.StyledPanel)
         frame.setFrameShadow(QFrame.Raised)
 
-        layout = QHBoxLayout(frame)
+        frame_layout = QHBoxLayout(frame)
 
         label_feature = QLabel(feature)
         label_value = QLabel(str(value))
 
-        layout.addWidget(label_feature)
-        layout.addWidget(label_value)
+        frame_layout.addWidget(label_feature)
+        frame_layout.addWidget(label_value)
 
-        self.left_frame_info.addWidget(frame)
+        self.verticalLayout_4.addWidget(frame)
+
+    def add_spacer(self):
+        # self.verticalLayout_4.addStretch()
+        spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.verticalLayout_4.addItem(spacer)
+
 
 
 def start_app():
