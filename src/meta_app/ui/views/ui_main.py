@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QMainWindow, QScrollArea, QSizePolicy, QSpacerItem,
-    QStackedWidget, QVBoxLayout, QWidget)
+    QMainWindow, QPushButton, QScrollArea, QSizePolicy,
+    QSpacerItem, QStackedWidget, QVBoxLayout, QWidget)
+from meta_app.ui.views import images_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -36,8 +37,40 @@ class Ui_MainWindow(object):
         self.side_bar = QFrame(self.centralwidget)
         self.side_bar.setObjectName(u"side_bar")
         self.side_bar.setMinimumSize(QSize(60, 0))
-        self.side_bar.setFrameShape(QFrame.Shape.StyledPanel)
+        self.side_bar.setStyleSheet(u"background-color: rgb(72, 73, 73);")
+        self.side_bar.setFrameShape(QFrame.Shape.NoFrame)
         self.side_bar.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_3 = QVBoxLayout(self.side_bar)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(-1, 22, -1, -1)
+        self.settings_btn = QPushButton(self.side_bar)
+        self.settings_btn.setObjectName(u"settings_btn")
+        self.settings_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.settings_btn.setStyleSheet(u"border: none;\n"
+"margin-bottom: 10px;")
+        icon = QIcon()
+        icon.addFile(u":/images/main-icon.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.settings_btn.setIcon(icon)
+        self.settings_btn.setIconSize(QSize(30, 30))
+
+        self.verticalLayout_3.addWidget(self.settings_btn)
+
+        self.settings_btn_2 = QPushButton(self.side_bar)
+        self.settings_btn_2.setObjectName(u"settings_btn_2")
+        self.settings_btn_2.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.settings_btn_2.setStyleSheet(u"border: none;\n"
+"margin-bottom: 10px;")
+        icon1 = QIcon()
+        icon1.addFile(u":/images/settings_icon.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.settings_btn_2.setIcon(icon1)
+        self.settings_btn_2.setIconSize(QSize(30, 30))
+
+        self.verticalLayout_3.addWidget(self.settings_btn_2)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer_3)
+
 
         self.horizontalLayout.addWidget(self.side_bar)
 
@@ -90,17 +123,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.scrollArea = QScrollArea(self.info_page)
         self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setFrameShape(QFrame.Shape.NoFrame)
         self.scrollArea.setWidgetResizable(True)
         self.scroll_file_content = QWidget()
         self.scroll_file_content.setObjectName(u"scroll_file_content")
-        self.scroll_file_content.setGeometry(QRect(0, 0, 720, 480))
+        self.scroll_file_content.setGeometry(QRect(0, 0, 716, 476))
         self.horizontalLayout_4 = QHBoxLayout(self.scroll_file_content)
         self.horizontalLayout_4.setSpacing(0)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.left_frame_info = QFrame(self.scroll_file_content)
         self.left_frame_info.setObjectName(u"left_frame_info")
-        self.left_frame_info.setFrameShape(QFrame.Shape.StyledPanel)
+        self.left_frame_info.setFrameShape(QFrame.Shape.NoFrame)
         self.left_frame_info.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout_4 = QVBoxLayout(self.left_frame_info)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -119,6 +153,15 @@ class Ui_MainWindow(object):
         self.label_3.setObjectName(u"label_3")
 
         self.horizontalLayout_3.addWidget(self.label_3)
+
+        self.pushButton = QPushButton(self.frame_2)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+"color: rgb(66, 66, 67);\n"
+"border-radius: 3px;\n"
+"padding: 5px;")
+
+        self.horizontalLayout_3.addWidget(self.pushButton)
 
 
         self.verticalLayout_4.addWidget(self.frame_2)
@@ -154,8 +197,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.settings_btn.setText("")
+        self.settings_btn_2.setText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u041f\u0435\u0440\u0435\u0442\u0430\u0449\u0438\u0442\u0435 \u0444\u0430\u0439\u043b", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u0420\u0430\u0437\u043c\u0435\u0440", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c", None))
     # retranslateUi
 
