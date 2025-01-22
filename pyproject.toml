@@ -8,9 +8,15 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9,<3.14"
 dependencies = [
-    "pyside6 (>=6.8.1.1,<7.0.0.0)"
+    "pyside6 (>=6.8.1.1,<7.0.0.0)",
+    "exif (>=1.6.1,<2.0.0)",
+    "pillow (>=11.1.0,<12.0.0)"
 ]
 
+[tool.poetry]
+packages = [
+    { include = "meta_app", from = "src" }
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
