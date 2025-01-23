@@ -1,9 +1,11 @@
 import webbrowser
 
-def open_url(data):
-    link = create_map_link(data)
-    print(link)
+def open_url(link):
     webbrowser.open(link)
+
+def open_gps_url(data):
+    link = create_map_link(data)
+    open_url(link)
 
 def dms_to_decimal(dms):
     degrees, minutes, seconds = dms
