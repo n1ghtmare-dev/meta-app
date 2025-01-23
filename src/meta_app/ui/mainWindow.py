@@ -1,9 +1,9 @@
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import (QApplication, QMainWindow, QFrame, QHBoxLayout, QLabel, QVBoxLayout, QSpacerItem,
-                               QSizePolicy, QPushButton, QWidget, QScrollArea)
+                               QSizePolicy, QPushButton, QWidget, QScrollArea, QLineEdit, QMessageBox)
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from meta_app.ui.views.ui_main import Ui_MainWindow
-from meta_app.core.file_handler import get_photo_data
+from meta_app.core.file_handler import get_photo_data, update_exif_data
 from meta_app.core.funcs import *
 import logging
 
@@ -14,7 +14,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("Meta App")
         self.__init()
-        self.tag_labels = {}
+        self.file_tags = {}
+        self.path_in_widget = []
 
     def __init(self) -> None:
         self.setAcceptDrops(True)
@@ -38,11 +39,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             urls = event.mimeData().urls()
             if urls:
                 file_path = urls[0].toLocalFile()
+                file_name = file_path.split("/")[-1]
+                self.path_in_widget.append(file_path)
+                self.file_tags[file_name] = {}
                 if self.pages.currentWidget() != self.info_page:
                     self.pages.setCurrentWidget(self.info_page)
                 self.show_file_info(file_path)
 
-    def show_file_info(self, file_path) -> None:
+
+    def show_file_info(self, file_path):
         file_data = get_photo_data(file_path)
         file_name = file_path.split("/")[-1]
         left_frame_info = self.add_new_tab(file_name)
@@ -51,6 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.create_file_feature(key, value, left_frame_info)
 
         self.add_spacer()
+        self.create_save_button(left_frame_info)
 
     def add_new_tab(self, name: str) -> QVBoxLayout:
         new_tab = QWidget(self.files_tab)
@@ -90,7 +96,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         frame.setFrameShadow(QFrame.Raised)
 
         frame_layout = QHBoxLayout(frame)
-        self.tag_labels[feature] = value
+
+        current_file = self.get_current_file()
+        self.file_tags[current_file][feature] = value
 
         if len(feature) > 30:
             feature = f"{feature[:30]}..."
@@ -98,13 +106,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             value = f"{str(value)[:20]}..."
 
         label_feature = QLabel(feature)
-        label_value = QLabel(str(value))
+        line_edit_value = QLineEdit(str(value))
+        line_edit_value.setObjectName(feature)
+        line_edit_value.setFixedWidth(200)
+        line_edit_value.editingFinished.connect(self.update_metadata)
 
         frame_layout.addWidget(label_feature)
-        frame_layout.addWidget(label_value)
+        frame_layout.addWidget(line_edit_value)
         self.check_feature(feature, frame_layout, frame)
 
         left_frame_info.addWidget(frame)
+
+    def update_metadata(self) -> None:
+        sender = self.sender()
+        if sender:
+            current_file = self.get_current_file()
+            feature = sender.objectName()
+            new_value = sender.text()
+            self.file_tags[current_file][feature] = new_value
+
+    def create_save_button(self, layout: QVBoxLayout) -> None:
+        save_button = QPushButton("Сохранить")
+        save_button.setStyleSheet(
+            "background-color: rgb(46, 204, 113); color: white; font-weight: bold; padding: 5px; border-radius: 5px;"
+        )
+        save_button.clicked.connect(self.save_file)
+        layout.addWidget(save_button)
 
     def create_btn(self, layout: QHBoxLayout, frame, text) -> None:
         pushButton = QPushButton(frame)
@@ -120,15 +147,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if feature == 'GPSInfo':
             self.create_btn(layout, frame, u'Посмотреть')
 
+    def save_file(self):
+        tab_index = self.files_tab.currentIndex()
+        file_path = self.path_in_widget[tab_index]
+        current_file = self.get_current_file()
+
+        if not file_path:
+            return
+
+        updated_metadata = self.file_tags[current_file]
+        try:
+            update_exif_data(file_path, updated_metadata)
+            QMessageBox.information(self, "Успешно", "Изменения успешно сохранены!")
+        except Exception as e:
+            print(e)
+            QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить файл: {str(e)}")
+
+    def get_current_file(self) -> str:
+        tab_index = self.files_tab.currentIndex()
+        file_path = self.path_in_widget[tab_index]
+        file_name = file_path.split("/")[-1]
+
+        return file_name
+
     def get_label_text(self, tag: str) -> tuple:
-        return self.tag_labels[tag]
+        current_file = self.get_current_file()
+        return self.tag_labels[current_file][tag]
 
     def add_spacer(self) -> None:
         spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.verticalLayout_4.addItem(spacer)
 
     def gps_info_open(self) -> None:
-        open_gps_url(self.tag_labels['GPSInfo'])
+        current_file = self.get_current_file()
+        open_gps_url(self.tag_labels[current_file]['GPSInfo'])
 
     @staticmethod
     def open_tg() -> None:
