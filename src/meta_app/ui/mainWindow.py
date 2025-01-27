@@ -156,12 +156,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
         updated_metadata = self.file_tags[current_file]
-        try:
-            update_exif_data(file_path, updated_metadata)
-            QMessageBox.information(self, "Успешно", "Изменения успешно сохранены!")
-        except Exception as e:
-            print(e)
-            QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить файл: {str(e)}")
+        # try:
+        update_exif_data(file_path, updated_metadata)
+        QMessageBox.information(self, "Успешно", "Изменения успешно сохранены!")
+        # except Exception as e:
+        #     print(e)
+        #     QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить файл: {str(e)}")
 
     def get_current_file(self) -> str:
         tab_index = self.files_tab.currentIndex()
